@@ -36,29 +36,33 @@ echo 'export PATH="$PATH:$SPARK_HOME/bin"' >> /etc/profile
 #For anon. user to work
 adduser --disabled-password --quiet --system ftp
 
+# We can't use the default pure-ftp unfortunatelly.
 #apt-get -y install pure-ftpd
+
 # Disable capabilities, see here: https://hub.docker.com/r/stilliard/pure-ftpd/~/dockerfile/
 dpkg -i /tmp/bin/pure-ftpd-common*.deb
 apt-get -y install openbsd-inetd
 dpkg -i /tmp/bin/pure-ftpd_*.deb
 apt-mark hold pure-ftpd pure-ftpd-common
 
-rm /etc/pure-ftpd/conf/NoAnonymous
-echo "yes" > /etc/pure-ftpd/conf/CallUploadScript
-echo "yes" > /etc/pure-ftpd/conf/AnonymousOnly
-echo "30000 30009" > /etc/pure-ftpd/conf/PassivePortRange
-mkdir /opt/pure-ftpd
-mkdir /root/items
-mv /tmp/scripts/on_upload.sh /opt/pure-ftpd/on_upload.sh
-#chmod +x /home/ubuntu/scripts/on_upload.sh
+#rm /etc/pure-ftpd/conf/NoAnonymous
+#echo "yes" > /etc/pure-ftpd/conf/CallUploadScript
+#echo "yes" > /etc/pure-ftpd/conf/AnonymousOnly
+#echo "30000 30009" > /etc/pure-ftpd/conf/PassivePortRange
 
-mv /tmp/scripts/pure-ftpd-common /etc/default/pure-ftpd-common
+mkdir /opt/pure-ftpd
+mv /tmp/scripts/on_upload.sh /opt/pure-ftpd/on_upload.sh
+
+#mv /tmp/scripts/pure-ftpd-common /etc/default/pure-ftpd-common
+
+mkdir /root/items
 
 # @startup
 mkdir /etc/service/pureftp
 mv /tmp/scripts/start_pureftp.sh /etc/service/pureftp/run
 
-
+mkdir /etc/service/uploadscript
+mv /tmp/scripts/start_uploadscript.sh /etc/service/uploadscript/run
 
 # Clean up APT when done.
 apt-get clean
